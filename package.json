@@ -4,7 +4,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "linkedin:exchange-token": "node scripts/exchange-token.js",
+    "linkedin:post": "node scripts/post-to-linkedin.js",
+    "linkedin:userinfo": "node scripts/get-userinfo.js"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.1",

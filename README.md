@@ -1,109 +1,69 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+# LinkedIn Post Automation
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+This project automates posting to LinkedIn using Node.js scripts, Supabase, and GitHub Actions.
 
-## Features
+## Automated Posting Workflow
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Proxy
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+- **post.yml** (in `.github/workflows/`):
+  - Runs on a schedule (cron) or manually.
+  - Installs dependencies and runs a Node.js script to post to LinkedIn.
+  - Uses secrets for `LINKEDIN_ACCESS_TOKEN` and `API_URL` (your API endpoint for fetching the next post).
 
-## Demo
+## How to Generate and Seed Daily Posts Using AI
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+1. **Generate Posts with AI**
+	- Use an AI tool (e.g., OpenAI, Copilot) to generate a batch of LinkedIn post ideas/content for each day.
+	- Save these posts in a format suitable for seeding (e.g., CSV, JSON).
 
-## Deploy to Vercel
+2. **Seed Posts in Supabase**
+	- Insert the generated posts into your Supabase database table (e.g., `scheduled_posts`).
+	- Each row should have: post text, scheduled date, status (pending/posted), etc.
+	- You can use Supabase SQL editor, dashboard, or a script to seed the data.
 
-Vercel deployment will guide you through creating a Supabase account and project.
+3. **API Endpoint for Next Post**
+	- Expose an API (e.g., `/api/linkedin/post`) that returns the next scheduled post from Supabase.
+	- The GitHub Action calls this API to fetch the post content to publish.
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+4. **GitHub Action (post.yml)**
+	- Runs on schedule (e.g., every day at a set time).
+	- Calls your API to get the next post.
+	- Posts to LinkedIn using the access token.
+	- Marks the post as posted in Supabase.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+## Running Locally
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+- Use the scripts in the `scripts/` directory:
+  - `npm run linkedin:exchange-token -- <AUTH_CODE>`: Exchange code for access token.
+  - `npm run linkedin:userinfo`: Get user info.
+  - `npm run linkedin:post -- <PERSON_URN> "<POST_TEXT>"`: Post to LinkedIn.
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+## Environment Variables
 
-## Clone and run locally
+- `LINKEDIN_CLIENT_ID`, `LINKEDIN_CLIENT_SECRET`, `LINKEDIN_REDIRECT_URI` (for token exchange)
+- `LINKEDIN_ACCESS_TOKEN` (for posting)
+- `API_URL` (for GitHub Action to fetch posts)
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+## Example: Seeding Supabase with AI-Generated Posts
 
-2. Create a Next.js app using the Supabase Starter template npx command
+1. Generate posts (e.g., with OpenAI):
+	```json
+	[
+	  { "text": "Day 1: How to automate LinkedIn posts with Node.js!" },
+	  { "text": "Day 2: Using Supabase as a content scheduler." }
+	]
+	```
+2. Insert into Supabase (via dashboard or script).
 
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
+## Example: post.yml (GitHub Action)
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
+- Schedules and posts daily using your API and LinkedIn token.
+- See `.github/workflows/post.yml` for details.
 
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
+---
 
-3. Use `cd` to change into the app's directory
+**Tip:**
+- Regenerate your LinkedIn access token every ~60 days.
+- Never commit secrets to git.
+- Use GitHub Secrets for all sensitive values.
 
-   ```bash
-   cd with-supabase-app
-   ```
-
-4. Rename `.env.example` to `.env.local` and update the following:
-
-  ```env
-  NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=[INSERT SUPABASE PROJECT API PUBLISHABLE OR ANON KEY]
-  ```
-  > [!NOTE]
-  > This example uses `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, which refers to Supabase's new **publishable** key format.
-  > Both legacy **anon** keys and new **publishable** keys can be used with this variable name during the transition period. Supabase's dashboard may show `NEXT_PUBLIC_SUPABASE_ANON_KEY`; its value can be used in this example.
-  > See the [full announcement](https://github.com/orgs/supabase/discussions/29260) for more information.
-
-  Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
-
-5. You can now run the Next.js local development server:
-
-   ```bash
-   npm run dev
-   ```
-
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
-
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
-
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
-
-## Feedback and issues
-
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
-
-## More Supabase examples
-
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)

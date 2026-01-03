@@ -1,0 +1,23 @@
+name: Post to LinkedIn
+
+on:
+  schedule:
+    - cron: "30 4 * * 1,4" # 10:00 AM IST on Monday, Thursday, and Sunday.
+  workflow_dispatch:
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - run: npm install node-fetch
+
+      - run: npm run linkedin:post -- ${{ secrets.PERSON_URN }} ${{ secrets.API_URL }}
+        env:
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }} # update settings > security > secrets and variables > actions. Read LINKEDIN_ACCESS_TOKEN.md for more details on how to generate this token.
+          
